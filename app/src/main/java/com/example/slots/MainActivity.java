@@ -52,9 +52,17 @@ public class MainActivity extends AppCompatActivity {
         begin = new beginSlot();
         handler = new Handler();
         rand = new Random();
-        points = 0;
+        if(savedInstanceState==null) {
+            points = 0;
+            off=false;  
+        }else {
+            points = savedInstanceState.getInt("SCORE");
+            pointsText.setText("" + points);
+            off = savedInstanceState.getBoolean("OFF");
+            if(off)
+                startButton.setText("STOP");
+        }
         fruit = 0;
-        off = false;
         for(int i=0;i<3;i++){
             images[i] = (ImageView) getLayoutInflater().inflate(R.layout.slot_view,null);
             images[i].setMinimumWidth(270);
@@ -63,6 +71,24 @@ public class MainActivity extends AppCompatActivity {
             grid.addView(images[i]);
         }
 
+    }
+
+    public void onPause(){
+        super.onPause();
+        handler.removeCallbacks(begin);
+    }
+
+    public void onResume(){
+        super.onResume();
+        if(off){
+            handler.postDelayed(begin,100);
+        }
+    }
+
+    public void onSaveInstanceState(Bundle bundle){
+        super.onSaveInstanceState(bundle);
+        bundle.putInt("SCORE",points);
+        bundle.putBoolean("OFF",off);
     }
 
     public void rules(View v){
